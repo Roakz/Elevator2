@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;   
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,9 +29,10 @@ namespace ElevatorChallenge
 
             }
 
-            private void PerformAction() { }
-
-
+            public void PerformAction(int menuItemIndex) {
+                Console.Write("we made it!!");
+                Console.ReadLine();
+            }
         }
 
         class Menu
@@ -43,12 +45,43 @@ namespace ElevatorChallenge
 
             public void PrintMenu()
             {
+
+                Console.WriteLine("Please make a selection");
+
                 foreach (MenuItem menuItem in menuItemList)
                 {
-                    Console.WriteLine($"{menuItem.Index} {menuItem.Name}");
+                   Console.WriteLine($"{menuItem.Index} {menuItem.Name}");                    
                 }
+                ProcessUserInput();
             }
-        }
+
+            public void ProcessUserInput()
+            {
+                int userSelection;
+
+                try
+                {
+                    userSelection = Convert.ToInt32(Console.ReadLine());
+                } catch
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please select 1-4 only.");
+                    PrintMenu();
+                    return;
+                }
+                
+                bool valid = Enumerable.Range(1, menuItemList.Count).Contains(userSelection);
+
+                if (valid == true) {
+                    menuItemList[userSelection - 1].PerformAction(userSelection);} else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please select 1-4 only.");
+                    PrintMenu();
+                }                    
+            }
+         }
+
         static void Main(string[] args)
         {
             string[] menuItemInputs = { "Up", "Down", "Instructions", "Exit" };
@@ -61,7 +94,9 @@ namespace ElevatorChallenge
 
             Menu mainMenu = new Menu(menuItemsList);
             mainMenu.PrintMenu();
+            Console.Clear();
             Console.Read();
+           
         }
     }
 }
