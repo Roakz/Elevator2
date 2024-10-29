@@ -29,9 +29,25 @@ namespace ElevatorChallenge
 
             }
 
-            public void PerformAction(int menuItemIndex) {
-                Console.Write("we made it!!");
-                Console.ReadLine();
+            public void PerformAction(int menuItemIndex, Menu mainMenu) {
+                if(Name == "Instructions")
+                {
+                    PrintInstructions(mainMenu);
+                }
+            }
+
+            private void PrintInstructions(Menu mainMenu)
+            {
+                Console.WriteLine("Welcome to elevator MADNESS!!\n" +
+                    "Select up or down from the menu. Enter the requested details and enjoy your ride.\n" +
+                    "you will recieve updates as we go and a file output at the end of the game. \n" +
+                    "Add as many trips as you like. There are 3 lifts and each lift can hold 6 people.\n" +
+                    "See if you can fill them up!\n" +
+                    "Press any key to exit."); // File output location?
+
+                Console.Read();
+                mainMenu.PrintMenu();
+                
             }
         }
 
@@ -73,7 +89,7 @@ namespace ElevatorChallenge
                 bool valid = Enumerable.Range(1, menuItemList.Count).Contains(userSelection);
 
                 if (valid == true) {
-                    menuItemList[userSelection - 1].PerformAction(userSelection);} else
+                    menuItemList[userSelection - 1].PerformAction(userSelection, this);} else
                 {
                     Console.Clear();
                     Console.WriteLine("Please select 1-4 only.");
