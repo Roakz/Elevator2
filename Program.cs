@@ -9,7 +9,6 @@ namespace ElevatorChallenge
 {
     class Program
     {
-
         class MenuItem
         {
             public int Index { get; }
@@ -26,24 +25,23 @@ namespace ElevatorChallenge
                 return
                     $"Index = {Index}" +
                     $"\nName = {Name}";
-
             }
 
             public void PerformAction(int menuItemIndex, Menu mainMenu, JobAllocator jobAllocator) {
-                if(Name == "Instructions")
+                switch (Name)
                 {
-                    PrintInstructions(mainMenu, jobAllocator);
-                }
-                if(Name == "Exit")
-                {
-                    return;
-                }
-                if(Name == "Up" || Name == "Down")
-                {
-                   List<string> travellerData = PrintUserCreationMenu();
-                   jobAllocator.jobList.Add(new Job(travellerData[0], Convert.ToInt32(travellerData[1]), Convert.ToInt32(travellerData[2])));
-                   // Job allocator do your thang!
-                   // print menu.
+                    case "Instructions":
+                        PrintInstructions(mainMenu, jobAllocator);
+                        break;
+                    case "Exit":
+                        break;
+
+                    default:
+                        List<string> travellerData = PrintUserCreationMenu();
+                        jobAllocator.jobList.Add(new Job(travellerData[0], Convert.ToInt32(travellerData[1]), Convert.ToInt32(travellerData[2])));
+                        break;
+                        // Job allocator do your thang!
+                        // print menu.
                 }
             }
 
@@ -59,7 +57,6 @@ namespace ElevatorChallenge
                 Console.ReadLine();
                 Console.Clear();
                 mainMenu.PrintMenu(jobAllocator);
-                
             }
 
             private List<string> PrintUserCreationMenu()
@@ -71,7 +68,6 @@ namespace ElevatorChallenge
                 answers.Add(Console.ReadLine());
                 Console.WriteLine("Desired Floor?");
                 answers.Add(Console.ReadLine());
-
                 return answers;
             }
         }
@@ -81,7 +77,6 @@ namespace ElevatorChallenge
             public List<Job> jobList { get; }
          }
 
-
         class Menu
         {
             private List<MenuItem> menuItemList;
@@ -89,12 +84,9 @@ namespace ElevatorChallenge
             {
                 menuItemList = menuItems;
             }
-
             public void PrintMenu(JobAllocator jobAllocator)
             {
-                
                 Console.WriteLine("Please make a selection");
-
                 foreach (MenuItem menuItem in menuItemList)
                 {
                    Console.WriteLine($"{menuItem.Index} {menuItem.Name}");                    
@@ -105,7 +97,6 @@ namespace ElevatorChallenge
             public void ProcessUserInput(JobAllocator jobAllocator)
             {
                 int userSelection;
-
                 try
                 {
                     userSelection = Convert.ToInt32(Console.ReadLine());
@@ -116,9 +107,7 @@ namespace ElevatorChallenge
                     PrintMenu(jobAllocator);
                     return;
                 }
-                
                 bool valid = Enumerable.Range(1, menuItemList.Count).Contains(userSelection);
-
                 if (valid == true) {
                     menuItemList[userSelection - 1].PerformAction(userSelection, this, jobAllocator);
                     if (userSelection == 4) {
@@ -140,14 +129,12 @@ namespace ElevatorChallenge
             string Name { get; }
             int Location { get; set; }
             int Desiredlocation { get; }
-         
             public Job(string name, int initialLocation, int desiredLocation)
             {
                 this.Name = name;
                 this.Location = initialLocation;
                 this.Desiredlocation = desiredLocation;
             }
-
         }
 
         static void Main(string[] args)
@@ -159,7 +146,6 @@ namespace ElevatorChallenge
             {
                 menuItemsList.Add(new MenuItem(i + 1, menuItemInputs[i]));
             }
-
             JobAllocator jobAllocator = new JobAllocator();
             Menu mainMenu = new Menu(menuItemsList);
             mainMenu.PrintMenu(jobAllocator);           
