@@ -34,6 +34,10 @@ namespace ElevatorChallenge
                 {
                     PrintInstructions(mainMenu);
                 }
+                if(Name == "Exit")
+                {
+                    return;
+                }
             }
 
             private void PrintInstructions(Menu mainMenu)
@@ -109,10 +113,7 @@ namespace ElevatorChallenge
             }
 
             Menu mainMenu = new Menu(menuItemsList);
-            mainMenu.PrintMenu();
-            Console.Clear();
-            Console.Read();
-           
+            mainMenu.PrintMenu();           
         }
     }
 }
