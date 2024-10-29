@@ -41,20 +41,23 @@ namespace ElevatorChallenge
                 if(Name == "Up" || Name == "Down")
                 {
                    List<string> travellerData = PrintUserCreationMenu();
-                    jobAllocator.jobList.Add(new Job(travellerData[0], Convert.ToInt32(travellerData[1]), Convert.ToInt32(travellerData[2])));
+                   jobAllocator.jobList.Add(new Job(travellerData[0], Convert.ToInt32(travellerData[1]), Convert.ToInt32(travellerData[2])));
+                   // Job allocator do your thang!
+                   // print menu.
                 }
             }
 
             private void PrintInstructions(Menu mainMenu, JobAllocator jobAllocator)
             {
+                Console.Clear();
                 Console.WriteLine("Welcome to elevator MADNESS!!\n" +
                     "Select up or down from the menu. Enter the requested details and enjoy your ride.\n" +
                     "you will recieve updates as we go and a file output at the end of the game. \n" +
                     "Add as many trips as you like. There are 3 lifts and each lift can hold 6 people.\n" +
                     "See if you can fill them up!\n" +
-                    "Press any key to exit."); // File output location?
-
-                Console.Read();
+                    "Press any key to exit.\n\n\n\n"); // File output location?
+                Console.ReadLine();
+                Console.Clear();
                 mainMenu.PrintMenu(jobAllocator);
                 
             }
@@ -89,7 +92,7 @@ namespace ElevatorChallenge
 
             public void PrintMenu(JobAllocator jobAllocator)
             {
-
+                
                 Console.WriteLine("Please make a selection");
 
                 foreach (MenuItem menuItem in menuItemList)
@@ -119,7 +122,7 @@ namespace ElevatorChallenge
                 if (valid == true) {
                     menuItemList[userSelection - 1].PerformAction(userSelection, this, jobAllocator);
                     if (userSelection == 4) {
-                        return;
+                        Environment.Exit(0);
                             } else { 
                         PrintMenu(jobAllocator);
                     }
