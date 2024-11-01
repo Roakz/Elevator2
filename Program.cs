@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace ElevatorChallenge
 {
@@ -39,9 +40,9 @@ namespace ElevatorChallenge
                     default:
                         List<string> travellerData = PrintUserCreationMenu();
                         jobAllocator.jobList.Add(new Job(travellerData[0], Convert.ToInt32(travellerData[1]), Convert.ToInt32(travellerData[2])));
+                        jobAllocator.Computate();
+                        mainMenu.PrintMenu(jobAllocator);
                         break;
-                        // Job allocator do your thang!
-                        // print menu.
                 }
             }
 
@@ -74,7 +75,24 @@ namespace ElevatorChallenge
 
         class JobAllocator
         {
+            public Lift[] AllocatorLiftArray;
             public List<Job> jobList { get; }
+
+            public JobAllocator(Lift[] liftArray)
+            {
+                jobList = new List<Job>();
+                AllocatorLiftArray = liftArray;
+            }
+
+            public void Computate() {
+                //Where is the desired pickup?
+                int newJobPickupFloor = jobList[(jobList.Count - 1)].Location;
+                //Where is each lift?
+                //Are any lifts within 2 floors? if yes are they heading the right direction if yes which one is quickest based on stop times. 
+                //If no are there any stationary lifts? if yes are they closer than a moving lift? if yes deploy stationary lift.
+                // If no and moving lift is heading in the right direction. Then is it going to be quicker with stop times. if yes add to list if no deploy stationary
+                
+            }
          }
 
         class Menu
@@ -126,14 +144,45 @@ namespace ElevatorChallenge
 
         class Job
         {
-            string Name { get; }
-            int Location { get; set; }
-            int Desiredlocation { get; }
+            public string Name { get; }
+            public int Location { get; set; }
+            public int Desiredlocation { get; }
+
+            Stopwatch stopWatch = new Stopwatch();
+
+
             public Job(string name, int initialLocation, int desiredLocation)
             {
-                this.Name = name;
-                this.Location = initialLocation;
-                this.Desiredlocation = desiredLocation;
+                Name = name;
+                Location = initialLocation;
+                Desiredlocation = desiredLocation;
+                stopWatch.Start();
+            }
+        }
+
+        class Building
+        {
+            public int MetresBetweenFloors { get; }
+            public int Levels { get; }
+
+            public Building()
+            {
+                MetresBetweenFloors = 6;
+                Levels = 6;
+            }
+        }
+
+        class Lift
+        {
+            public int MetresPerSecond { get; }
+            public int secondsElapsedDoorOpeningClosing { get; }
+            public List<int> priorities = new List<int>();
+            public int LiftNumber { get; }
+            public Lift(int liftNumber)
+            {
+                LiftNumber = liftNumber;
+                secondsElapsedDoorOpeningClosing = 6;
+                MetresPerSecond = 1;
             }
         }
 
@@ -146,7 +195,12 @@ namespace ElevatorChallenge
             {
                 menuItemsList.Add(new MenuItem(i + 1, menuItemInputs[i]));
             }
-            JobAllocator jobAllocator = new JobAllocator();
+            Building building = new Building();
+            Lift[] liftArray = new Lift[3];
+            liftArray[0] = new Lift(1);
+            liftArray[1] = new Lift(2);
+            liftArray[2] = new Lift(3);
+            JobAllocator jobAllocator = new JobAllocator(liftArray);
             Menu mainMenu = new Menu(menuItemsList);
             mainMenu.PrintMenu(jobAllocator);           
         }
