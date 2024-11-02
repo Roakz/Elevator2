@@ -28,7 +28,7 @@ namespace ElevatorChallenge
                     $"\nName = {Name}";
             }
 
-            public void PerformAction(int menuItemIndex, Menu mainMenu, JobAllocator jobAllocator) {
+            public void PerformAction(int menuItemIndex, Menu mainMenu, JobAllocator jobAllocator, Lift[] liftArray) {
                 switch (Name)
                 {
                     case "Instructions":
@@ -40,7 +40,7 @@ namespace ElevatorChallenge
                     default:
                         List<string> travellerData = PrintUserCreationMenu();
                         jobAllocator.jobList.Add(new Job(travellerData[0], Convert.ToInt32(travellerData[1]), Convert.ToInt32(travellerData[2])));
-                        jobAllocator.Computate();
+                        jobAllocator.Computate(liftArray);
                         mainMenu.PrintMenu(jobAllocator);
                         break;
                 }
@@ -82,25 +82,52 @@ namespace ElevatorChallenge
             {
                 jobList = new List<Job>();
                 AllocatorLiftArray = liftArray;
+                //Temporary Testing Job
+                //jobList.Add(new Job("Rory", 1, 3));
             }
 
-            public void Computate() {
+            public void Computate(Lift[] liftArray) {
+
+                //Select the newly appened job
+                Job newJob = jobList[(jobList.Count - 1)];
                 //Where is the desired pickup?
-                int newJobPickupFloor = jobList[(jobList.Count - 1)].Location;
-                //Where is each lift?
-                //Are any lifts within 2 floors? if yes are they heading the right direction if yes which one is quickest based on stop times. 
-                //If no are there any stationary lifts? if yes are they closer than a moving lift? if yes deploy stationary lift.
+                int newJobPickupFloor = newJob.Location;
+
+                //BELLLOW REQUIRED HANDLING IF THERE ARE NO LIFTS RETURNED
+
+                //query to return lifts give or take 2 floors from jobs pickup location.
+                IEnumerable<Lift> LiftInZoneQuery = from x in liftArray
+                            where Enumerable.Range(newJob.Location - 2, newJob.Location + 2).Contains(x.CurrentLocation)
+                            select x;
+                //Is the passenger travelling up.
+                bool goingUp = newJob.Desiredlocation > newJob.Location;
+                IEnumerable<Lift> liftSelectionQuery;
+                //query to select lifts from above or below them and within the zone depending on if they are travelling up on down.
+                if(goingUp == true)
+                {
+                    liftSelectionQuery = from lift in LiftInZoneQuery
+                                         where lift.CurrentLocation < newJob.Location
+                                         select lift;
+                }else
+                {
+                    liftSelectionQuery = from lift in LiftInZoneQuery
+                                         where lift.CurrentLocation > newJob.Location
+                                         select lift;
+                }
+                //Execute liftSelection query. If there are available lifts then pick whichever one will make it the quickest. Otherwise
+                //If no lifts are in the zone are there any stationary lifts? if yes are they closer than a moving lift? if yes deploy stationary lift.
                 // If no and moving lift is heading in the right direction. Then is it going to be quicker with stop times. if yes add to list if no deploy stationary
-                
             }
          }
 
         class Menu
         {
             private List<MenuItem> menuItemList;
-            public Menu(List<MenuItem> menuItems)
+            public Lift[] liftArrayRef;
+            public Menu(List<MenuItem> menuItems, Lift[] liftArray)
             {
                 menuItemList = menuItems;
+                liftArrayRef = liftArray;
             }
             public void PrintMenu(JobAllocator jobAllocator)
             {
@@ -127,7 +154,7 @@ namespace ElevatorChallenge
                 }
                 bool valid = Enumerable.Range(1, menuItemList.Count).Contains(userSelection);
                 if (valid == true) {
-                    menuItemList[userSelection - 1].PerformAction(userSelection, this, jobAllocator);
+                    menuItemList[userSelection - 1].PerformAction(userSelection, this, jobAllocator, liftArrayRef);
                     if (userSelection == 4) {
                         Environment.Exit(0);
                             } else { 
@@ -178,11 +205,23 @@ namespace ElevatorChallenge
             public int secondsElapsedDoorOpeningClosing { get; }
             public List<int> priorities = new List<int>();
             public int LiftNumber { get; }
+            public int CurrentLocation { get; set; }
+            public string TravelStatus { get; set; }
+
             public Lift(int liftNumber)
             {
                 LiftNumber = liftNumber;
                 secondsElapsedDoorOpeningClosing = 6;
                 MetresPerSecond = 1;
+                CurrentLocation = 1;
+                //Test code
+                TravelStatus = "UP";
+            }
+
+            public int returnLocation()
+            {
+                // Sone code to return where the lift currently is
+                return 0;
             }
         }
 
@@ -201,7 +240,7 @@ namespace ElevatorChallenge
             liftArray[1] = new Lift(2);
             liftArray[2] = new Lift(3);
             JobAllocator jobAllocator = new JobAllocator(liftArray);
-            Menu mainMenu = new Menu(menuItemsList);
+            Menu mainMenu = new Menu(menuItemsList, liftArray);
             mainMenu.PrintMenu(jobAllocator);           
         }
     }
