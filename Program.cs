@@ -94,10 +94,10 @@ namespace ElevatorChallenge
                 int newJobPickupFloor = newJob.Location;
                 //query to return lifts give or take 2 floors from jobs pickup location.
                 IEnumerable<Lift> LiftInZoneQuery = from x in liftArray
-                                                    where Enumerable.Range(newJob.Location - 2, newJob.Location + 2).Contains(x.CurrentLocation)
+                                                    where Enumerable.Range(newJobPickupFloor - 2, newJobPickupFloor + 2).Contains(x.CurrentLocation)
                                                     select x;
                 //Is the passenger travelling up.
-                bool goingUp = newJob.Desiredlocation > newJob.Location;
+                bool goingUp = newJob.Desiredlocation > newJobPickupFloor;
                 IEnumerable<Lift> liftSelectionQuery;
                 // As long as there are lifts in the zone assign a new query to select lifts from above or below the pickup point
                 //that are travelling the right direction depoending on the travellers direction of travel.
@@ -106,13 +106,13 @@ namespace ElevatorChallenge
                     if (goingUp == true)
                     {
                         liftSelectionQuery = from lift in LiftInZoneQuery
-                                             where lift.CurrentLocation < newJob.Location
+                                             where lift.CurrentLocation < newJobPickupFloor
                                              select lift;
                     }
                     else
                     {
                         liftSelectionQuery = from lift in LiftInZoneQuery
-                                             where lift.CurrentLocation > newJob.Location
+                                             where lift.CurrentLocation > newJobPickupFloor
                                              select lift;
                     }
 
@@ -122,8 +122,22 @@ namespace ElevatorChallenge
                         //If more than one lift which one will be quicker? 
                         if (liftSelectionQuery.Count() > 1) {
                             //which one will be quicker
+                            // data needed: floors from pickup location, Stops on way, 
+                            //calculations: travel speed per metre x metres to pickup point + stop time per stop
+                            int selectedLift = 0;
+                            foreach(Lift lift in liftSelectionQuery)
+                            {
+                               if(goingUp == true)
+                                {
+                                    int pikcupDistance = (newJobPickupFloor - lift.CurrentLocation) * Building.DistanceBetweenLevels;
+                                    foreach(int priority in lift.Priorities) {
+                                        ifEnumerable.Range(lift.CurrentLocation, newJobPickupFloor).Contains(priority) .......
+                                    }
+                                }
+                            }
+                            
                         } else {
-                            LiftInZoneQuery.First().Priorities.Add(newJob.Location);
+                            LiftInZoneQuery.First().Priorities.Add(newJobPickupFloor);
                          }
                     }
 
@@ -206,16 +220,10 @@ namespace ElevatorChallenge
             }
         }
 
-        class Building
+        static class Building
         {
-            public int MetresBetweenFloors { get; }
-            public int Levels { get; }
-
-            public Building()
-            {
-                MetresBetweenFloors = 6;
-                Levels = 6;
-            }
+            static public int DistanceBetweenLevels {get;} = 6;
+            static public int Levels { get; } = 6;
         }
 
         class Lift
@@ -253,7 +261,6 @@ namespace ElevatorChallenge
             {
                 menuItemsList.Add(new MenuItem(i + 1, menuItemInputs[i]));
             }
-            Building building = new Building();
             Lift[] liftArray = new Lift[3];
             liftArray[0] = new Lift(1);
             liftArray[1] = new Lift(2);
